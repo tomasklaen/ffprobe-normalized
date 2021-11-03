@@ -112,7 +112,7 @@ interface VideoData {
 ```ts
 
 // All numbers are 0 or 1
-export interface Disposition {
+interface Disposition {
 	default: number;
 	dub: number;
 	original: number;
@@ -127,7 +127,7 @@ export interface Disposition {
 	timed_thumbnails: number;
 }
 
-export interface ImageStream {
+interface ImageStream {
 	type: 'image';
 	codec: string; // 'mjpeg', ...
 	width: number;
@@ -137,9 +137,9 @@ export interface ImageStream {
 	tags?: {[key: string]: any};
 }
 
-export type CoverStream = Omit<ImageStream, 'disposition'>;
+type CoverStream = Omit<ImageStream, 'disposition'>;
 
-export interface VideoStream {
+interface VideoStream {
 	type: 'video';
 	codec: string;
 	width: number;
@@ -150,7 +150,7 @@ export interface VideoStream {
 	tags?: {[key: string]: any};
 }
 
-export interface AudioStream {
+interface AudioStream {
 	type: 'audio';
 	codec: string;
 	channels: number;
@@ -160,7 +160,7 @@ export interface AudioStream {
 	tags?: {[key: string]: any};
 }
 
-export interface SubtitlesStream {
+interface SubtitlesStream {
 	type: 'subtitles';
 	codec: string;
 	language?: string;
@@ -169,5 +169,5 @@ export interface SubtitlesStream {
 	tags?: {[key: string]: any};
 }
 
-export type Stream = ImageStream | VideoStream | AudioStream | SubtitlesStream;
+type Stream = ImageStream | VideoStream | AudioStream | SubtitlesStream;
 ```
