@@ -28,7 +28,7 @@ console.log(meta.artist); // Artist name
 ## API
 
 ```ts
-async function ffprobe(path: string, options: {path?: string}): Promise<MetaData>;
+async function ffprobe(path: string, options: {path?: string}): Promise<Meta>;
 ```
 
 Retrieves media file meta data. See below for interfaces.
@@ -42,16 +42,16 @@ Default: `process.env.FFPROBE_PATH || 'ffprobe'`
 
 Path to ffprobe binary.
 
-### MetaData
+### Meta
 
 ```ts
-type MetaData = ImageData | AudioData | VideoData;
+type Meta = ImageMeta | AudioMeta | VideoMeta;
 ```
 
-#### ImageData
+#### ImageMeta
 
 ```ts
-interface ImageData {
+interface ImageMeta {
 	path: string;
 	type: 'image';
 	size: number;
@@ -63,10 +63,10 @@ interface ImageData {
 }
 ```
 
-#### AudioData
+#### AudioMeta
 
 ```ts
-interface AudioData {
+interface AudioMeta {
 	path: string;
 	type: 'audio';
 	size: number;
@@ -86,10 +86,10 @@ interface AudioData {
 }
 ```
 
-#### VideoData
+#### VideoMeta
 
 ```ts
-interface VideoData {
+interface VideoMeta {
 	path: string;
 	type: 'video';
 	codec: string;

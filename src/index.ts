@@ -143,7 +143,7 @@ export interface SubtitlesStream {
 
 export type Stream = ImageStream | VideoStream | AudioStream | SubtitlesStream;
 
-export interface ImageData {
+export interface ImageMeta {
 	path: string;
 	type: 'image';
 	size: number;
@@ -154,7 +154,7 @@ export interface ImageData {
 	[key: string]: any; // other metadata
 }
 
-export interface AudioData {
+export interface AudioMeta {
 	path: string;
 	type: 'audio';
 	size: number;
@@ -173,7 +173,7 @@ export interface AudioData {
 	[key: string]: any; // other metadata
 }
 
-export interface VideoData {
+export interface VideoMeta {
 	path: string;
 	type: 'video';
 	codec: string;
@@ -190,7 +190,7 @@ export interface VideoData {
 	[key: string]: any; // other metadata
 }
 
-export type MetaData = ImageData | AudioData | VideoData;
+export type Meta = ImageMeta | AudioMeta | VideoMeta;
 
 /**
  * Get media file meta
@@ -198,7 +198,7 @@ export type MetaData = ImageData | AudioData | VideoData;
 export async function ffprobe(
 	filePath: string,
 	{path: ffprobePath = process.env.FFPROBE_PATH || 'ffprobe'}: {path?: string} = {}
-): Promise<MetaData> {
+): Promise<Meta> {
 	filePath = Path.resolve(filePath);
 	let rawData: RawProbeData;
 	let streams: Stream[];
