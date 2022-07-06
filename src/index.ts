@@ -437,7 +437,7 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 
 				const sar = parseAspectRatio(rawStream.sample_aspect_ratio) || 1;
 				const dar = parseAspectRatio(rawStream.display_aspect_ratio) || (width / height) * sar;
-				const displayWidth = sar > 1 ? width * sar : width;
+				const displayWidth = sar > 1 ? Math.round(width * sar) : width;
 				const displayHeight = sar > 1 ? height : Math.round(width / dar);
 
 				// Check if we are dealing with an image (single frame)
