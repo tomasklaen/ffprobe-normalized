@@ -99,30 +99,34 @@ export interface Disposition {
 	timed_thumbnails: number;
 }
 
-export interface ImageStream {
+export type ImageStream = {[key: string]: unknown} & {
 	type: 'image';
 	codec: string; // 'mjpeg', ...
 	width: number;
 	height: number;
+	sar: number;
+	dar: number;
 	title?: string;
 	disposition: Disposition;
 	tags?: {[key: string]: any};
-}
+};
 
 export type CoverStream = Omit<ImageStream, 'disposition'>;
 
-export interface VideoStream {
+export type VideoStream = {[key: string]: unknown} & {
 	type: 'video';
 	codec: string;
 	width: number;
 	height: number;
 	framerate: number;
+	sar: number;
+	dar: number;
 	title?: string;
 	disposition: Disposition;
 	tags?: {[key: string]: any};
-}
+};
 
-export interface AudioStream {
+export type AudioStream = {[key: string]: unknown} & {
 	type: 'audio';
 	codec: string;
 	channels: number;
@@ -130,20 +134,20 @@ export interface AudioStream {
 	title?: string;
 	disposition: Disposition;
 	tags?: {[key: string]: any};
-}
+};
 
-export interface SubtitlesStream {
+export type SubtitlesStream = {[key: string]: unknown} & {
 	type: 'subtitles';
 	codec: string;
 	language?: string;
 	title?: string;
 	disposition: Disposition;
 	tags?: {[key: string]: any};
-}
+};
 
 export type Stream = ImageStream | VideoStream | AudioStream | SubtitlesStream;
 
-export interface ImageMeta {
+export type ImageMeta = {[key: string]: unknown} & {
 	path: string;
 	type: 'image';
 	size: number;
@@ -151,10 +155,11 @@ export interface ImageMeta {
 	container: string;
 	width: number;
 	height: number;
-	[key: string]: any; // other metadata
-}
+	sar: number;
+	dar: number;
+};
 
-export interface AudioMeta {
+export type AudioMeta = {[key: string]: unknown} & {
 	path: string;
 	type: 'audio';
 	size: number;
@@ -170,10 +175,9 @@ export interface AudioMeta {
 	artist?: string;
 	album_artist?: string;
 	track?: string;
-	[key: string]: any; // other metadata
-}
+};
 
-export interface VideoMeta {
+export type VideoMeta = {[key: string]: unknown} & {
 	path: string;
 	type: 'video';
 	codec: string;
@@ -184,11 +188,13 @@ export interface VideoMeta {
 	size: number;
 	width: number;
 	height: number;
+	sar: number;
+	dar: number;
 	streams: Stream[];
+	videoStreams: VideoStream[];
 	audioStreams: AudioStream[];
 	subtitlesStreams: SubtitlesStream[];
-	[key: string]: any; // other metadata
-}
+};
 
 export type Meta = ImageMeta | AudioMeta | VideoMeta;
 
@@ -245,10 +251,10 @@ export async function ffprobe(
 	let firstSubtitleStream: SubtitlesStream | undefined;
 
 	for (const stream of streams) {
-		if (stream.type === 'video' && !firstVideoStream) firstVideoStream = stream;
-		if (stream.type === 'audio' && !firstAudioStream) firstAudioStream = stream;
-		if (stream.type === 'image' && !firstImageStream) firstImageStream = stream;
-		if (stream.type === 'subtitles' && !firstSubtitleStream) firstSubtitleStream = stream;
+		if (isVideoStream(stream) && !firstVideoStream) firstVideoStream = stream;
+		if (isAudioStream(stream) && !firstAudioStream) firstAudioStream = stream;
+		if (isImageStream(stream) && !firstImageStream) firstImageStream = stream;
+		if (isSubtitlesStream(stream) && !firstSubtitleStream) firstSubtitleStream = stream;
 	}
 
 	const formatTags = lowercaseProps(removeNullProps(rawData.format.tags));
@@ -272,8 +278,11 @@ export async function ffprobe(
 			framerate: firstVideoStream.framerate,
 			width: firstVideoStream.width,
 			height: firstVideoStream.height,
+			sar: firstVideoStream.sar,
+			dar: firstVideoStream.dar,
 			size: rawData.format.size,
 			streams,
+			videoStreams: streams.filter(isVideoStream),
 			audioStreams: streams.filter(isAudioStream),
 			subtitlesStreams: streams.filter(isSubtitlesStream),
 		};
@@ -318,6 +327,8 @@ export async function ffprobe(
 			container: extractFileFormat(filePath), // format.format_name reports weird stuff like image2 for images
 			width: firstImageStream.width,
 			height: firstImageStream.height,
+			sar: firstImageStream.sar,
+			dar: firstImageStream.dar,
 		};
 	}
 
@@ -386,6 +397,9 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 				if (!Number.isInteger(width) || width < 1) throw extractError('width');
 				if (!Number.isInteger(height) || height < 1) throw extractError('height');
 
+				const sar = parseAspectRatio(rawStream.sample_aspect_ratio) || 1;
+				const dar = parseAspectRatio(rawStream.display_aspect_ratio) || (width / height) * 1;
+
 				// Check if we are dealing with an image (single frame)
 				// Checks if duration spans only 1 frame.
 				// Or if the stream has a cover art disposition.
@@ -400,6 +414,8 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 						codec,
 						width,
 						height,
+						sar,
+						dar,
 						disposition: rawStream.disposition,
 						tags,
 					});
@@ -409,6 +425,8 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 						codec,
 						width,
 						height,
+						sar,
+						dar,
 						framerate,
 						disposition: rawStream.disposition,
 						tags,
@@ -432,12 +450,34 @@ const codecNameSubstitutes: Record<string, string> = {
 	mjpeg: 'jpeg',
 };
 
+function isVideoStream(value: Stream): value is VideoStream {
+	return value.type === 'video';
+}
+
+function isImageStream(value: Stream): value is ImageStream {
+	return value.type === 'image';
+}
+
 function isAudioStream(value: Stream): value is AudioStream {
 	return value.type === 'audio';
 }
 
 function isSubtitlesStream(value: Stream): value is SubtitlesStream {
 	return value.type === 'subtitles';
+}
+
+/**
+ * `"2:1"` -> `2`
+ * `"2/1"` -> `2`
+ * `"2"` -> `2`
+ */
+function parseAspectRatio(value: unknown) {
+	const groups = /^(?<numerator>\d+(\.\d+)?)((:|\/)(?<denominator>\d+(\.\d+)?))?$/.exec(`${value}`)?.groups;
+	if (!groups) return null;
+	const numerator = groups.numerator ? parseInt(groups.numerator, 10) : undefined;
+	const denominator = groups.nominator ? parseInt(groups.nominator, 10) : undefined;
+	if (numerator == null || !Number.isFinite(numerator)) return null;
+	return denominator != null && Number.isFinite(denominator) ? numerator / denominator : numerator;
 }
 
 /**
