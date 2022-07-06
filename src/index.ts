@@ -110,9 +110,9 @@ export type ImageStream = {[key: string]: unknown} & {
 	sar: number;
 	/** Display aspect ratio. */
 	dar: number;
-	/** Display width for decoders. This will always be same as `width`. */
+	/** Width as it'll be rendered by players respecting sar. */
 	displayWidth: number;
-	/** Display height for decoders. This is `width / dar`. */
+	/** Height as it'll be rendered by players respecting sar. */
 	displayHeight: number;
 	title?: string;
 	disposition: Disposition;
@@ -132,9 +132,9 @@ export type VideoStream = {[key: string]: unknown} & {
 	sar: number;
 	/** Display aspect ratio. */
 	dar: number;
-	/** Display width for decoders. This will always be same as `width`. */
+	/** Width as it'll be rendered by players respecting sar. */
 	displayWidth: number;
-	/** Display height for decoders. This is `width / dar`. */
+	/** Height as it'll be rendered by players respecting sar. */
 	displayHeight: number;
 	framerate: number;
 	title?: string;
@@ -177,9 +177,9 @@ export type ImageMeta = {[key: string]: unknown} & {
 	sar: number;
 	/** Display aspect ratio. */
 	dar: number;
-	/** Display width for decoders. This will always be same as `width`. */
+	/** Width as it'll be rendered by players respecting sar. */
 	displayWidth: number;
-	/** Display height for decoders. This is `width / dar`. */
+	/** Height as it'll be rendered by players respecting sar. */
 	displayHeight: number;
 };
 
@@ -218,9 +218,9 @@ export type VideoMeta = {[key: string]: unknown} & {
 	sar: number;
 	/** Display aspect ratio. */
 	dar: number;
-	/** Display width for decoders. This will always be same as `width`. */
+	/** Width as it'll be rendered by players respecting sar. */
 	displayWidth: number;
-	/** Display height for decoders. This is `width / dar`. */
+	/** Height as it'll be rendered by players respecting sar. */
 	displayHeight: number;
 	streams: Stream[];
 	videoStreams: VideoStream[];
@@ -437,6 +437,8 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 
 				const sar = parseAspectRatio(rawStream.sample_aspect_ratio) || 1;
 				const dar = parseAspectRatio(rawStream.display_aspect_ratio) || (width / height) * sar;
+				const displayWidth = sar > 1 ? width * sar : width;
+				const displayHeight = sar > 1 ? height : Math.round(width / dar);
 
 				// Check if we are dealing with an image (single frame)
 				// Checks if duration spans only 1 frame.
@@ -455,8 +457,8 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 						height,
 						sar,
 						dar,
-						displayWidth: width,
-						displayHeight: Math.round(width / dar),
+						displayWidth,
+						displayHeight,
 						disposition: rawStream.disposition,
 						tags,
 					});
@@ -469,8 +471,8 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 						height,
 						sar,
 						dar,
-						displayWidth: width,
-						displayHeight: Math.round(width / dar),
+						displayWidth,
+						displayHeight,
 						framerate,
 						disposition: rawStream.disposition,
 						tags,

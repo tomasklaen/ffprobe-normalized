@@ -65,9 +65,9 @@ interface ImageMeta {
 	sar: number;
 	/** Display aspect ratio. */
 	dar: number;
-	/** Display width for decoders. This will always be same as `width`. */
+	/** Width as it'll be rendered by players respecting sar. */
 	displayWidth: number;
-	/** Display height for decoders. This is `width / dar`. */
+	/** Height as it'll be rendered by players respecting sar. */
 	displayHeight: number;
 	[key: string]: unknown; // other raw metadata
 }
@@ -116,9 +116,9 @@ interface VideoMeta {
 	sar: number;
 	/** Display aspect ratio. */
 	dar: number;
-	/** Display width for decoders. This will always be same as `width`. */
+	/** Width as it'll be rendered by players respecting sar. */
 	displayWidth: number;
-	/** Display height for decoders. This is `width / dar`. */
+	/** Height as it'll be rendered by players respecting sar. */
 	displayHeight: number;
 	streams: Stream[];
 	audioStreams: AudioStream[];
@@ -157,9 +157,9 @@ interface ImageStream {
 	sar: number;
 	/** Display aspect ratio. */
 	dar: number;
-	/** Display width for decoders. This will always be same as `width`. */
+	/** Width as it'll be rendered by players respecting sar. */
 	displayWidth: number;
-	/** Display height for decoders. This is `width / dar`. */
+	/** Height as it'll be rendered by players respecting sar. */
 	displayHeight: number;
 	title?: string;
 	disposition: Disposition;
@@ -180,9 +180,9 @@ interface VideoStream {
 	sar: number;
 	/** Display aspect ratio. */
 	dar: number;
-	/** Display width for decoders. This will always be same as `width`. */
+	/** Width as it'll be rendered by players respecting sar. */
 	displayWidth: number;
-	/** Display height for decoders. This is `width / dar`. */
+	/** Height as it'll be rendered by players respecting sar. */
 	displayHeight: number;
 	framerate: number;
 	title?: string;
