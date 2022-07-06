@@ -57,10 +57,18 @@ interface ImageMeta {
 	size: number;
 	codec: string;
 	container: string;
+	/** Raw width of image data. */
 	width: number;
+	/** Raw height of image data. */
 	height: number;
-	sar: number; // sample aspect ratio
-	dar: number; // display aspect ratio
+	/** Sample aspect ratio. */
+	sar: number;
+	/** Display aspect ratio. */
+	dar: number;
+	/** Display width for decoders. This will always be same as `width`. */
+	displayWidth: number;
+	/** Display height for decoders. This is `width / dar`. */
+	displayHeight: number;
 	[key: string]: unknown; // other raw metadata
 }
 ```
@@ -100,10 +108,18 @@ interface VideoMeta {
 	framerate: number;
 	title?: string;
 	size: number; // bytes
-	width: number; // width of the first video stream, 0 if no video streams
-	height: number; // height of the first video stream, 0 if no video streams
-	sar: number; // sample aspect ratio
-	dar: number; // display aspect ratio
+	/** Raw width of image data. */
+	width: number;
+	/** Raw height of image data. */
+	height: number;
+	/** Sample aspect ratio. */
+	sar: number;
+	/** Display aspect ratio. */
+	dar: number;
+	/** Display width for decoders. This will always be same as `width`. */
+	displayWidth: number;
+	/** Display height for decoders. This is `width / dar`. */
+	displayHeight: number;
 	streams: Stream[];
 	audioStreams: AudioStream[];
 	subtitlesStreams: SubtitlesStream[];
@@ -133,10 +149,18 @@ interface Disposition {
 interface ImageStream {
 	type: 'image';
 	codec: string; // 'mjpeg', ...
+	/** Raw width of image data. */
 	width: number;
+	/** Raw height of image data. */
 	height: number;
-	sar: number; // sample aspect ratio
-	dar: number; // display aspect ratio
+	/** Sample aspect ratio. */
+	sar: number;
+	/** Display aspect ratio. */
+	dar: number;
+	/** Display width for decoders. This will always be same as `width`. */
+	displayWidth: number;
+	/** Display height for decoders. This is `width / dar`. */
+	displayHeight: number;
 	title?: string;
 	disposition: Disposition;
 	tags?: {[key: string]: any};
@@ -148,10 +172,18 @@ type CoverStream = Omit<ImageStream, 'disposition'>;
 interface VideoStream {
 	type: 'video';
 	codec: string;
+	/** Raw width of image data. */
 	width: number;
+	/** Raw height of image data. */
 	height: number;
-	sar: number; // sample aspect ratio
-	dar: number; // display aspect ratio
+	/** Sample aspect ratio. */
+	sar: number;
+	/** Display aspect ratio. */
+	dar: number;
+	/** Display width for decoders. This will always be same as `width`. */
+	displayWidth: number;
+	/** Display height for decoders. This is `width / dar`. */
+	displayHeight: number;
 	framerate: number;
 	title?: string;
 	disposition: Disposition;

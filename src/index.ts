@@ -102,10 +102,18 @@ export interface Disposition {
 export type ImageStream = {[key: string]: unknown} & {
 	type: 'image';
 	codec: string; // 'mjpeg', ...
+	/** Raw width of image data. */
 	width: number;
+	/** Raw height of image data. */
 	height: number;
+	/** Sample aspect ratio. */
 	sar: number;
+	/** Display aspect ratio. */
 	dar: number;
+	/** Display width for decoders. This will always be same as `width`. */
+	displayWidth: number;
+	/** Display height for decoders. This is `width / dar`. */
+	displayHeight: number;
 	title?: string;
 	disposition: Disposition;
 	tags?: {[key: string]: any};
@@ -116,11 +124,19 @@ export type CoverStream = Omit<ImageStream, 'disposition'>;
 export type VideoStream = {[key: string]: unknown} & {
 	type: 'video';
 	codec: string;
+	/** Raw width of image data. */
 	width: number;
+	/** Raw height of image data. */
 	height: number;
-	framerate: number;
+	/** Sample aspect ratio. */
 	sar: number;
+	/** Display aspect ratio. */
 	dar: number;
+	/** Display width for decoders. This will always be same as `width`. */
+	displayWidth: number;
+	/** Display height for decoders. This is `width / dar`. */
+	displayHeight: number;
+	framerate: number;
 	title?: string;
 	disposition: Disposition;
 	tags?: {[key: string]: any};
@@ -153,10 +169,18 @@ export type ImageMeta = {[key: string]: unknown} & {
 	size: number;
 	codec: string;
 	container: string;
+	/** Raw width of image data. */
 	width: number;
+	/** Raw height of image data. */
 	height: number;
+	/** Sample aspect ratio. */
 	sar: number;
+	/** Display aspect ratio. */
 	dar: number;
+	/** Display width for decoders. This will always be same as `width`. */
+	displayWidth: number;
+	/** Display height for decoders. This is `width / dar`. */
+	displayHeight: number;
 };
 
 export type AudioMeta = {[key: string]: unknown} & {
@@ -186,10 +210,18 @@ export type VideoMeta = {[key: string]: unknown} & {
 	framerate: number;
 	title?: string;
 	size: number;
+	/** Raw width of image data. */
 	width: number;
+	/** Raw height of image data. */
 	height: number;
+	/** Sample aspect ratio. */
 	sar: number;
+	/** Display aspect ratio. */
 	dar: number;
+	/** Display width for decoders. This will always be same as `width`. */
+	displayWidth: number;
+	/** Display height for decoders. This is `width / dar`. */
+	displayHeight: number;
 	streams: Stream[];
 	videoStreams: VideoStream[];
 	audioStreams: AudioStream[];
@@ -280,6 +312,8 @@ export async function ffprobe(
 			height: firstVideoStream.height,
 			sar: firstVideoStream.sar,
 			dar: firstVideoStream.dar,
+			displayWidth: firstVideoStream.displayWidth,
+			displayHeight: firstVideoStream.displayHeight,
 			size: rawData.format.size,
 			streams,
 			videoStreams: streams.filter(isVideoStream),
@@ -329,6 +363,8 @@ export async function ffprobe(
 			height: firstImageStream.height,
 			sar: firstImageStream.sar,
 			dar: firstImageStream.dar,
+			displayWidth: firstImageStream.displayWidth,
+			displayHeight: firstImageStream.displayHeight,
 		};
 	}
 
@@ -419,6 +455,8 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 						height,
 						sar,
 						dar,
+						displayWidth: width,
+						displayHeight: Math.round(width / dar),
 						disposition: rawStream.disposition,
 						tags,
 					});
@@ -431,6 +469,8 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 						height,
 						sar,
 						dar,
+						displayWidth: width,
+						displayHeight: Math.round(width / dar),
 						framerate,
 						disposition: rawStream.disposition,
 						tags,
