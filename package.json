@@ -1,6 +1,6 @@
 {
 	"name": "ffprobe-normalized",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"description": "Retrieves and normalizes ffprobe output.",
 	"homepage": "https://github.com/tomasklaen/ffprobe-normalized",
 	"bugs": "https://github.com/tomasklaen/ffprobe-normalized/issues",
