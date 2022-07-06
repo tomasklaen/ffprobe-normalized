@@ -436,7 +436,7 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 				if (!Number.isInteger(height) || height < 1) throw extractError('height');
 
 				const sar = parseAspectRatio(rawStream.sample_aspect_ratio) || 1;
-				const dar = parseAspectRatio(rawStream.display_aspect_ratio) || (width / height) * 1;
+				const dar = parseAspectRatio(rawStream.display_aspect_ratio) || (width / height) * sar;
 
 				// Check if we are dealing with an image (single frame)
 				// Checks if duration spans only 1 frame.
