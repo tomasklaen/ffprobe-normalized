@@ -475,7 +475,7 @@ function parseAspectRatio(value: unknown) {
 	const groups = /^(?<numerator>\d+(\.\d+)?)((:|\/)(?<denominator>\d+(\.\d+)?))?$/.exec(`${value}`)?.groups;
 	if (!groups) return null;
 	const numerator = groups.numerator ? parseInt(groups.numerator, 10) : undefined;
-	const denominator = groups.nominator ? parseInt(groups.nominator, 10) : undefined;
+	const denominator = groups.denominator ? parseInt(groups.denominator, 10) : undefined;
 	if (numerator == null || !Number.isFinite(numerator)) return null;
 	return denominator != null && Number.isFinite(denominator) ? numerator / denominator : numerator;
 }

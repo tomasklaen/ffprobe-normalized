@@ -18,6 +18,8 @@ test('probes image files', async (t) => {
 		container: 'jpg',
 		width: 800,
 		height: 450,
+		sar: 1,
+		dar: 800 / 450,
 	};
 	t.deepEqual(pluck(Object.keys(expectedMeta), meta), expectedMeta);
 });
@@ -75,6 +77,8 @@ test('probes video files', async (t) => {
 		duration: 10875,
 		width: 640,
 		height: 360,
+		sar: 1,
+		dar: 640 / 360,
 		title: 'test title',
 	};
 	t.deepEqual(pluck(Object.keys(expectedMeta), meta), expectedMeta);
