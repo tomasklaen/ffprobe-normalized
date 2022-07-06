@@ -361,6 +361,7 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 		switch (rawStream.codec_type) {
 			case 'subtitle': {
 				streams.push({
+					...rawStream,
 					type: 'subtitles',
 					codec,
 					disposition: rawStream.disposition,
@@ -375,6 +376,7 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 				if (channels == null) throw extractError('channels');
 
 				streams.push({
+					...rawStream,
 					type: 'audio',
 					codec,
 					channels,
@@ -410,6 +412,7 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 					disposition.timed_thumbnails
 				) {
 					streams.push({
+						...rawStream,
 						type: 'image',
 						codec,
 						width,
@@ -421,6 +424,7 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 					});
 				} else {
 					streams.push({
+						...rawStream,
 						type: 'video',
 						codec,
 						width,
