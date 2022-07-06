@@ -4,10 +4,10 @@ Retrieves and normalizes ffprobe output.
 
 Features:
 
-- Output interfaces that make it easy to differentiate between image, audio, and video files.
-- Nicely structured and categorized streams.
-- Normalized all times into milliseconds.
-- GIFs with only 1 frame are marked as image, while GIFs with more than 1 frame as video.
+-   Output interfaces that make it easy to differentiate between image, audio, and video files.
+-   Nicely structured and categorized streams.
+-   Normalized all times into milliseconds.
+-   GIFs with only 1 frame are marked as image, while GIFs with more than 1 frame as video.
 
 ## Install
 
@@ -59,7 +59,9 @@ interface ImageMeta {
 	container: string;
 	width: number;
 	height: number;
-	[key: string]: any; // other metadata
+	sar: number; // sample aspect ratio
+	dar: number; // display aspect ratio
+	[key: string]: unknown; // other raw metadata
 }
 ```
 
@@ -82,7 +84,7 @@ interface AudioMeta {
 	artist?: string;
 	album_artist?: string;
 	track?: string;
-	[key: string]: any; // other metadata
+	[key: string]: unknown; // other raw metadata
 }
 ```
 
@@ -100,17 +102,18 @@ interface VideoMeta {
 	size: number; // bytes
 	width: number; // width of the first video stream, 0 if no video streams
 	height: number; // height of the first video stream, 0 if no video streams
+	sar: number; // sample aspect ratio
+	dar: number; // display aspect ratio
 	streams: Stream[];
 	audioStreams: AudioStream[];
 	subtitlesStreams: SubtitlesStream[];
-	[key: string]: any; // other metadata
+	[key: string]: unknown; // other raw metadata
 }
 ```
 
 #### Streams
 
 ```ts
-
 // All numbers are 0 or 1
 interface Disposition {
 	default: number;
@@ -132,9 +135,12 @@ interface ImageStream {
 	codec: string; // 'mjpeg', ...
 	width: number;
 	height: number;
+	sar: number; // sample aspect ratio
+	dar: number; // display aspect ratio
 	title?: string;
 	disposition: Disposition;
 	tags?: {[key: string]: any};
+	[key: string]: unknown; // other raw metadata
 }
 
 type CoverStream = Omit<ImageStream, 'disposition'>;
@@ -144,10 +150,13 @@ interface VideoStream {
 	codec: string;
 	width: number;
 	height: number;
+	sar: number; // sample aspect ratio
+	dar: number; // display aspect ratio
 	framerate: number;
 	title?: string;
 	disposition: Disposition;
 	tags?: {[key: string]: any};
+	[key: string]: unknown; // other raw metadata
 }
 
 interface AudioStream {
@@ -158,6 +167,7 @@ interface AudioStream {
 	title?: string;
 	disposition: Disposition;
 	tags?: {[key: string]: any};
+	[key: string]: unknown; // other raw metadata
 }
 
 interface SubtitlesStream {
@@ -167,6 +177,7 @@ interface SubtitlesStream {
 	title?: string;
 	disposition: Disposition;
 	tags?: {[key: string]: any};
+	[key: string]: unknown; // other raw metadata
 }
 
 type Stream = ImageStream | VideoStream | AudioStream | SubtitlesStream;
