@@ -425,12 +425,16 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 			case 'video': {
 				const [frNum, frDen] = (rawStream.r_frame_rate || '').split('/').map((part) => parseFloat(part));
 				const disposition = rawStream.disposition;
-				const framerate = frNum && frDen ? frNum / frDen : false;
+				let framerate = frNum && frDen ? frNum / frDen : false;
 				const width = rawStream.width;
 				const height = rawStream.height;
 
 				if (typeof framerate !== 'number' || !Number.isFinite(framerate) || framerate <= 0) {
 					throw extractError('framerate');
+				} else {
+					// We round to 6 decimal places because framerate calculated by `frNum / frDen` can produce
+					// huge floating point numbers that cause issues when passed to tools like ffmpeg.
+					framerate = Math.round(framerate * 1e6) / 1e6;
 				}
 				if (!Number.isInteger(width) || width < 1) throw extractError('width');
 				if (!Number.isInteger(height) || height < 1) throw extractError('height');
