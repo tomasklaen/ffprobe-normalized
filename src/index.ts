@@ -5,8 +5,8 @@ import {promisify} from 'util';
 
 export const exec = promisify(CP.exec);
 
-export interface RawProbeData {
-	streams: {
+export type RawProbeData = {[key: string]: unknown} & {
+	streams: {[key: string]: unknown} & {
 		index: number;
 		codec_name: string; // 'h264'
 		codec_long_name: string; // 'H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10'
@@ -47,7 +47,7 @@ export interface RawProbeData {
 		nb_frames?: string; // '450' (mp4)
 		disposition: Disposition;
 		// (mp4)
-		tags?: {
+		tags?: {[key: string]: unknown} & {
 			language: string; // 'und'
 			title?: string; // 'The Second Dream'
 			comment?: string; // 'The Second Dream'
@@ -55,7 +55,7 @@ export interface RawProbeData {
 			vendor_id: string; // '[0][0][0][0]'
 		};
 	}[];
-	format: {
+	format: {[key: string]: unknown} & {
 		filename: string; // 'sky.mp4'
 		nb_streams: number; // 1
 		nb_programs: number; // 0
@@ -67,7 +67,7 @@ export interface RawProbeData {
 		bit_rate?: string; // '3762044' (mp4, jpg)
 		probe_score: number; // 100
 		// (mp4)
-		tags?: {
+		tags?: {[key: string]: unknown} & {
 			encoder: string; // 'Lavf58.22.100'
 			album?: string; // 'Warframe'
 			genre?: string; // 'Score'
@@ -81,7 +81,7 @@ export interface RawProbeData {
 			compatible_brands?: string; // 'isomiso2avc1mp41'
 		};
 	};
-}
+};
 
 // All numbers are 0 or 1
 export interface Disposition {
@@ -181,6 +181,7 @@ export type ImageMeta = {[key: string]: unknown} & {
 	displayWidth: number;
 	/** Height as it'll be rendered by players respecting sar. */
 	displayHeight: number;
+	rawProbeData: RawProbeData;
 };
 
 export type AudioMeta = {[key: string]: unknown} & {
@@ -199,6 +200,7 @@ export type AudioMeta = {[key: string]: unknown} & {
 	artist?: string;
 	album_artist?: string;
 	track?: string;
+	rawProbeData: RawProbeData;
 };
 
 export type VideoMeta = {[key: string]: unknown} & {
@@ -226,6 +228,7 @@ export type VideoMeta = {[key: string]: unknown} & {
 	videoStreams: VideoStream[];
 	audioStreams: AudioStream[];
 	subtitlesStreams: SubtitlesStream[];
+	rawProbeData: RawProbeData;
 };
 
 export type Meta = ImageMeta | AudioMeta | VideoMeta;
@@ -319,6 +322,7 @@ export async function ffprobe(
 			videoStreams: streams.filter(isVideoStream),
 			audioStreams: streams.filter(isAudioStream),
 			subtitlesStreams: streams.filter(isSubtitlesStream),
+			rawProbeData: rawData,
 		};
 	}
 
@@ -346,6 +350,7 @@ export async function ffprobe(
 			channels: firstAudioStream.channels,
 			language: firstAudioStream.language,
 			cover,
+			rawProbeData: rawData,
 		};
 	}
 
@@ -365,6 +370,7 @@ export async function ffprobe(
 			dar: firstImageStream.dar,
 			displayWidth: firstImageStream.displayWidth,
 			displayHeight: firstImageStream.displayHeight,
+			rawProbeData: rawData,
 		};
 	}
 
