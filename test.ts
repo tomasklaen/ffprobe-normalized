@@ -1,6 +1,6 @@
 import test from 'ava';
 import * as Path from 'path';
-import {ffprobe} from './src';
+import {ffprobe, VideoMeta} from './src';
 
 const pluck = (keys: any[], target: Record<any, any>) =>
 	keys.reduce((result, key) => {
@@ -22,6 +22,7 @@ test('probes image files', async (t) => {
 		dar: 800 / 450,
 		displayWidth: 800,
 		displayHeight: 450,
+		pixelFormat: 'yuvj420p',
 	};
 	t.deepEqual(pluck(Object.keys(expectedMeta), meta), expectedMeta);
 });
@@ -70,7 +71,10 @@ test('probes audio files (ogg)', async (t) => {
 
 test('probes video files', async (t) => {
 	const path = Path.join(process.cwd(), 'fixtures', 'video.webm');
-	const meta = await ffprobe(path);
+	let meta = await ffprobe(path);
+	t.is(meta.type, 'video');
+	meta = meta as VideoMeta;
+	t.is(meta.videoStreams.length, 1);
 	const expectedMeta = {
 		type: 'video',
 		path: path,
@@ -86,4 +90,8 @@ test('probes video files', async (t) => {
 		title: 'test title',
 	};
 	t.deepEqual(pluck(Object.keys(expectedMeta), meta), expectedMeta);
+	const expectedStreamMeta = {
+		pixelFormat: 'yuv420p',
+	};
+	t.deepEqual(pluck(Object.keys(expectedStreamMeta), (meta.streams as any)[0]), expectedStreamMeta);
 });

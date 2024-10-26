@@ -116,6 +116,7 @@ export type ImageStream = {[key: string]: unknown} & {
 	displayHeight: number;
 	title?: string;
 	disposition: Disposition;
+	pixelFormat: string;
 	tags?: {[key: string]: any};
 };
 
@@ -139,6 +140,7 @@ export type VideoStream = {[key: string]: unknown} & {
 	framerate: number;
 	title?: string;
 	disposition: Disposition;
+	pixelFormat: string;
 	tags?: {[key: string]: any};
 };
 
@@ -181,6 +183,7 @@ export type ImageMeta = {[key: string]: unknown} & {
 	displayWidth: number;
 	/** Height as it'll be rendered by players respecting sar. */
 	displayHeight: number;
+	pixelFormat: string;
 	rawProbeData: RawProbeData;
 };
 
@@ -370,6 +373,7 @@ export async function ffprobe(
 			dar: firstImageStream.dar,
 			displayWidth: firstImageStream.displayWidth,
 			displayHeight: firstImageStream.displayHeight,
+			pixelFormat: firstImageStream.pixelFormat,
 			rawProbeData: rawData,
 		};
 	}
@@ -449,6 +453,7 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 				const dar = parseAspectRatio(rawStream.display_aspect_ratio) || (width / height) * sar;
 				const displayWidth = sar > 1 ? Math.round(width * sar) : width;
 				const displayHeight = sar > 1 ? height : Math.round(width / dar);
+				const pixelFormat = String(rawStream.pix_fmt || 'unknown').toLowerCase();
 
 				// Check if we are dealing with an image (single frame)
 				// Checks if duration spans only 1 frame.
@@ -470,6 +475,7 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 						displayWidth,
 						displayHeight,
 						disposition: rawStream.disposition,
+						pixelFormat,
 						tags,
 					});
 				} else {
@@ -485,6 +491,7 @@ function normalizeStreams(rawData: RawProbeData): Stream[] {
 						displayHeight,
 						framerate,
 						disposition: rawStream.disposition,
+						pixelFormat,
 						tags,
 					});
 				}

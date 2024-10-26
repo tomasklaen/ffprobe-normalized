@@ -69,7 +69,8 @@ interface ImageMeta {
 	displayWidth: number;
 	/** Height as it'll be rendered by players respecting sar. */
 	displayHeight: number;
-	[key: string]: unknown; // other raw metadata
+	pixelFormat: string;
+	rawProbeData: RawProbeData; // See source for common props
 }
 ```
 
@@ -92,7 +93,7 @@ interface AudioMeta {
 	artist?: string;
 	album_artist?: string;
 	track?: string;
-	[key: string]: unknown; // other raw metadata
+	rawProbeData: RawProbeData;
 }
 ```
 
@@ -107,7 +108,7 @@ interface VideoMeta {
 	duration: number;
 	framerate: number;
 	title?: string;
-	size: number; // bytes
+	size: number;
 	/** Raw width of image data. */
 	width: number;
 	/** Raw height of image data. */
@@ -121,9 +122,10 @@ interface VideoMeta {
 	/** Height as it'll be rendered by players respecting sar. */
 	displayHeight: number;
 	streams: Stream[];
+	videoStreams: VideoStream[];
 	audioStreams: AudioStream[];
 	subtitlesStreams: SubtitlesStream[];
-	[key: string]: unknown; // other raw metadata
+	rawProbeData: RawProbeData;
 }
 ```
 
@@ -163,8 +165,8 @@ interface ImageStream {
 	displayHeight: number;
 	title?: string;
 	disposition: Disposition;
+	pixelFormat: string;
 	tags?: {[key: string]: any};
-	[key: string]: unknown; // other raw metadata
 }
 
 type CoverStream = Omit<ImageStream, 'disposition'>;
@@ -187,8 +189,8 @@ interface VideoStream {
 	framerate: number;
 	title?: string;
 	disposition: Disposition;
+	pixelFormat: string;
 	tags?: {[key: string]: any};
-	[key: string]: unknown; // other raw metadata
 }
 
 interface AudioStream {
@@ -199,7 +201,6 @@ interface AudioStream {
 	title?: string;
 	disposition: Disposition;
 	tags?: {[key: string]: any};
-	[key: string]: unknown; // other raw metadata
 }
 
 interface SubtitlesStream {
